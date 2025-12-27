@@ -90,12 +90,16 @@
 //! opcode prediction tasks.
 
 pub mod action;
+pub mod extended;
 pub mod instruction;
 pub mod modifier;
 pub mod subject;
 
 // Re-export main types
 pub use action::Action;
+pub use extended::{
+    CalcPayload, ExtendedInstruction, Op, Payload, PayloadType, TimePayload, TimeUnit,
+};
 pub use instruction::{Instruction, InstructionBuilder, InstructionError, INSTRUCTION_SIZE};
 pub use modifier::{Accuracy, Format, Modifier, Tone, Urgency, Voice, Warmth};
 pub use subject::Subject;
@@ -106,6 +110,9 @@ pub const ISA_VERSION: &str = "0.1.0";
 /// Convenience prelude for common imports
 pub mod prelude {
     pub use crate::action::Action;
+    pub use crate::extended::{
+        CalcPayload, ExtendedInstruction, Op, Payload, PayloadType, TimePayload, TimeUnit,
+    };
     pub use crate::instruction::{Instruction, InstructionBuilder, INSTRUCTION_SIZE};
     pub use crate::modifier::{Accuracy, Format, Modifier, Tone, Urgency, Voice, Warmth};
     pub use crate::subject::Subject;

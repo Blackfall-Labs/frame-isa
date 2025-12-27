@@ -115,20 +115,116 @@ Bit:  15  14  13  12  11  10   9   8   7   6   5   4   3   2   1   0
 | Accuracy | 7-6   | Low, Medium, High, Verified             |
 | Urgency  | 5-4   | Low, Normal, High, Critical             |
 
+## Extended Instructions
+
+For instructions that require operands (calculations, time queries), use `ExtendedInstruction`:
+
+```
+[BASE:6 bytes][PAYLOAD_TYPE:1 byte][PAYLOAD:N bytes]
+```
+
+### Payload Types
+
+| Type | ID   | Size | Description                                                   |
+| ---- | ---- | ---- | ------------------------------------------------------------- |
+| None | 0x00 | 0    | Base instruction only (7 bytes total)                         |
+| Calc | 0x01 | 17   | `[OP:1][A:8][B:8]` - Calculator args (24 bytes total)         |
+| Time | 0x02 | 14   | `[REF:8][DELTA:4][UNIT:1][TZ:1]` - Time args (21 bytes total) |
+
+### Calculator Payload
+
+```rust
+use frame_isa::{Action, Subject, Modifier, Instruction, ExtendedInstruction, CalcPayload, Op};
+
+// "15 + 7" -> CALCULATE instruction with args
+let base = Instruction::new(Action::CALCULATE, Subject::NUMBER, Modifier::default());
+let calc = CalcPayload::new(Op::Add, 15.0, 7.0);
+let ext = ExtendedInstruction::with_calc(base, calc);
+
+// Serialize: 24 bytes total
+let bytes = ext.to_bytes();
+assert_eq!(bytes.len(), 24);
+
+// Parse back
+let parsed = ExtendedInstruction::from_bytes(&bytes).unwrap();
+assert_eq!(parsed.as_calc().unwrap().a, 15.0);
+```
+
+### Time Payload
+
+```rust
+use frame_isa::{Action, Subject, Modifier, Instruction, ExtendedInstruction, TimePayload, TimeUnit};
+
+// "what time will it be in 3 hours"
+let base = Instruction::new(Action::RESPOND, Subject::TIME, Modifier::default());
+let time = TimePayload::with_delta(1735300000, 3, TimeUnit::Hour);
+let ext = ExtendedInstruction::with_time(base, time);
+
+// Serialize: 21 bytes total
+let bytes = ext.to_bytes();
+assert_eq!(bytes.len(), 21);
+```
+
+### Operations
+
+| Op   | Byte | Symbol | Description         |
+| ---- | ---- | ------ | ------------------- |
+| Add  | 0x2B | +      | Addition            |
+| Sub  | 0x2D | -      | Subtraction         |
+| Mul  | 0x2A | *      | Multiplication      |
+| Div  | 0x2F | /      | Division            |
+| Mod  | 0x25 | %      | Modulo              |
+| Pow  | 0x5E | ^      | Power               |
+| Sqrt | 0x53 | sqrt   | Square root (unary) |
+
 ## TRM Integration
 
 This crate is designed for use with TinyRecursiveModels (TRMs) that output opcodes directly.
 
-The factored prediction approach uses 3 heads:
+### Factored Prediction
+
+The factored prediction approach uses multiple heads:
+
+**Base Opcode (3 heads):**
 
 - ACT head → Action code
 - SUBJ head → Subject code
 - MOD head → Modifier flags
 
-This allows small models (~148K params) to achieve 99%+ accuracy on opcode prediction.
+**Extended Args (3 additional heads for CalcArgsModel):**
+
+- Op head → Operation type (7 classes)
+- A head → First operand (regression or pointer)
+- B head → Second operand (regression or pointer)
+
+### MicroChip Architecture
+
+For complex domains like math, multiple specialized MicroChips can work together:
+
+```
+┌─────────────────────────────────────────────────┐
+│                  IntelliChip                    │
+│         (Router + Context Manager)              │
+└────────────────────┬────────────────────────────┘
+                     │
+       ┌─────────────┼─────────────┐
+       ▼             ▼             ▼
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│ OpClassifier│ │ NumExtractor│ │ UnitParser  │
+│  MicroChip  │ │  MicroChip  │ │  MicroChip  │
+│   (~50K)    │ │   (~50K)    │ │   (~30K)    │
+└─────────────┘ └─────────────┘ └─────────────┘
+       │             │             │
+       └─────────────┼─────────────┘
+                     ▼
+              ExtendedInstruction
+```
+
+Each MicroChip is tiny (~30-50K params) and specialized. The IntelliChip orchestrates them to produce complete extended instructions.
 
 ## Related Crates
 
+- **frame-interpreter**: Execute instructions and return typed results
 - **frame-catalog**: Vector store and RAG system
 
 ## License
