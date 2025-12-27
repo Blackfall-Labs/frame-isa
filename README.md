@@ -75,29 +75,29 @@ let friendly = Modifier::friendly();  // Casual, warm, positive
 
 ### Actions (ACT)
 
-| Range | Category | Examples |
-|-------|----------|----------|
-| 0x00xx | System | NOP, HALT, ERROR, STATUS |
-| 0x01xx | Response | GREET, CONFIRM, DENY, EXPLAIN, RESPOND |
-| 0x02xx | Query | ASK, REQUEST, SEARCH, RETRIEVE |
-| 0x03xx | Knowledge | DEFINE, DESCRIBE, COMPARE, SUMMARIZE |
-| 0x04xx | Skill | CALCULATE, SET_TIMER, KNOWLEDGE_SEARCH |
-| 0x05xx | Emotion | EMPATHY, CONCERN, ENCOURAGEMENT |
-| 0x06xx | Template | TEMPLATE_LOAD, TEMPLATE_FILL |
-| 0x07xx | Chain | CHAIN, FORK, MERGE |
+| Range  | Category  | Examples                               |
+| ------ | --------- | -------------------------------------- |
+| 0x00xx | System    | NOP, HALT, ERROR, STATUS               |
+| 0x01xx | Response  | GREET, CONFIRM, DENY, EXPLAIN, RESPOND |
+| 0x02xx | Query     | ASK, REQUEST, SEARCH, RETRIEVE         |
+| 0x03xx | Knowledge | DEFINE, DESCRIBE, COMPARE, SUMMARIZE   |
+| 0x04xx | Skill     | CALCULATE, SET_TIMER, KNOWLEDGE_SEARCH |
+| 0x05xx | Emotion   | EMPATHY, CONCERN, ENCOURAGEMENT        |
+| 0x06xx | Template  | TEMPLATE_LOAD, TEMPLATE_FILL           |
+| 0x07xx | Chain     | CHAIN, FORK, MERGE                     |
 
 ### Subjects (SUBJ)
 
-| Range | Category | Examples |
-|-------|----------|----------|
-| 0x00xx | System | NULL, SELF, USER, CONTEXT |
-| 0x01xx | Common | WEATHER, TIME, DATE, SCHEDULE |
-| 0x02xx | Math/Science | NUMBER, EQUATION, PHYSICS |
-| 0x03xx | Technology | COMPUTER, SOFTWARE, AI, API |
-| 0x04xx | Knowledge | DOCUMENTATION, CONCEPT |
-| 0x05xx | Emotions | FEELINGS, STRESS, ANXIETY |
-| 0x06xx | TRM Refs | References to other TRM models |
-| 0xE0xx | RAG Refs | Dynamic document lookups |
+| Range  | Category     | Examples                       |
+| ------ | ------------ | ------------------------------ |
+| 0x00xx | System       | NULL, SELF, USER, CONTEXT      |
+| 0x01xx | Common       | WEATHER, TIME, DATE, SCHEDULE  |
+| 0x02xx | Math/Science | NUMBER, EQUATION, PHYSICS      |
+| 0x03xx | Technology   | COMPUTER, SOFTWARE, AI, API    |
+| 0x04xx | Knowledge    | DOCUMENTATION, CONCEPT         |
+| 0x05xx | Emotions     | FEELINGS, STRESS, ANXIETY      |
+| 0x06xx | TRM Refs     | References to other TRM models |
+| 0xE0xx | RAG Refs     | Dynamic document lookups       |
 
 ### Modifier Bit Layout
 
@@ -106,20 +106,21 @@ Bit:  15  14  13  12  11  10   9   8   7   6   5   4   3   2   1   0
       [--VOICE--] [--TONE--] [-WARM-] [--FORMAT--] [ACCURACY] [URGENCY]
 ```
 
-| Field | Bits | Values |
-|-------|------|--------|
-| Voice | 15-14 | Neutral, Formal, Casual, Technical |
-| Tone | 13-12 | Neutral, Positive, Empathetic, Cautious |
-| Warmth | 11-10 | Cold, Neutral, Warm, VeryWarm |
-| Format | 9-8 | Prose, Bulleted, Numbered, Structured |
-| Accuracy | 7-6 | Low, Medium, High, Verified |
-| Urgency | 5-4 | Low, Normal, High, Critical |
+| Field    | Bits  | Values                                  |
+| -------- | ----- | --------------------------------------- |
+| Voice    | 15-14 | Neutral, Formal, Casual, Technical      |
+| Tone     | 13-12 | Neutral, Positive, Empathetic, Cautious |
+| Warmth   | 11-10 | Cold, Neutral, Warm, VeryWarm           |
+| Format   | 9-8   | Prose, Bulleted, Numbered, Structured   |
+| Accuracy | 7-6   | Low, Medium, High, Verified             |
+| Urgency  | 5-4   | Low, Normal, High, Critical             |
 
 ## TRM Integration
 
 This crate is designed for use with TinyRecursiveModels (TRMs) that output opcodes directly.
 
 The factored prediction approach uses 3 heads:
+
 - ACT head → Action code
 - SUBJ head → Subject code
 - MOD head → Modifier flags
@@ -128,9 +129,7 @@ This allows small models (~148K params) to achieve 99%+ accuracy on opcode predi
 
 ## Related Crates
 
-- **sam-opcode**: Full interpreter with RAG and template support
 - **frame-catalog**: Vector store and RAG system
-- **intellichip**: TRM training and inference
 
 ## License
 
