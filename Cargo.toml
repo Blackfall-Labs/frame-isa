@@ -1,0 +1,17 @@
+[package]
+name = "frame-isa"
+version = "0.1.0"
+edition = "2021"
+authors = ["Magnus Trent <magnus@blackfall.dev>"]
+license = "MIT"
+repository = "https://github.com/Blackfall-Labs/frame-isa"
+description = "SAM Instruction Set Architecture - 6-byte opcode definitions for AI systems"
+keywords = ["opcode", "isa", "instruction-set", "sam", "ai"]
+categories = ["encoding", "parsing"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "2.0"
+
+[dev-dependencies]
+serde_json = "1.0"
